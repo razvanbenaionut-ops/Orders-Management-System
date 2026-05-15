@@ -1,4 +1,4 @@
-package DataAccess;
+package dataAccessLayer;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;

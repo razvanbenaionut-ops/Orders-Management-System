@@ -1,4 +1,4 @@
-package DataAccess;
+package dataAccessLayer;
 
 import Model.Client;
 
