@@ -125,23 +125,34 @@ public class AbstractDAO<T> {
         StringBuilder sb=new StringBuilder();
         sb.append("INSERT INTO ").append(type.getSimpleName()).append(" (");
         Field[] fields=type.getDeclaredFields();
+        boolean idField=true;
         for(int i=0;i<fields.length;i++) {
+            if(fields[i].getName().equals("id")) continue;
+            if(!idField)
+                sb.append(", ");
             sb.append(fields[i].getName());
-            if(i<fields.length-1) sb.append(", ");
+            idField=false;
         }
         sb.append(") VALUES (");
+        idField=true;
         for(int i=0;i<fields.length;i++) {
+            if(fields[i].getName().equals("id")) continue;
+            if(!idField)
+                sb.append(", ");
             sb.append("?");
-            if (i<fields.length-1) sb.append(", ");
+            idField=false;
         }
         sb.append(")");
         try {
             connection=ConnectionFactory.getConnection();
             statement=connection.prepareStatement(sb.toString());
+            int id=1;
             for(int i=0; i<fields.length;i++) {
+                if(fields[i].getName().equals("id")) continue;
                 fields[i].setAccessible(true);
                 Object value=fields[i].get(t);
-                statement.setObject(i + 1,value);
+                statement.setObject(id,value);
+                id++;
             }
             statement.executeUpdate();
         } catch (Exception e) {
@@ -192,6 +203,38 @@ public class AbstractDAO<T> {
             statement.executeUpdate();
         } catch (Exception e) {
             LOGGER.log(Level.WARNING,type.getName()+"DAO:update "+e.getMessage());
+        } finally {
+            ConnectionFactory.close(statement);
+            ConnectionFactory.close(connection);
+        }
+        return t;
+    }
+
+    public T delete(T t) {
+        Connection connection=null;
+        PreparedStatement statement=null;
+        StringBuilder sb=new StringBuilder();
+        sb.append("DELETE FROM ").append(type.getSimpleName()).append(" WHERE id = ?");
+        try {
+            connection=ConnectionFactory.getConnection();
+            statement=connection.prepareStatement(sb.toString());
+            Field[] fields=type.getDeclaredFields();
+            Object idValue=null;
+            for(Field field:fields) {
+                if(field.getName().equalsIgnoreCase("id")) {
+                    field.setAccessible(true);
+                    idValue=field.get(t);
+                    break;
+                }
+            }
+            if(idValue!=null) {
+                statement.setObject(1,idValue);
+            } else {
+                throw new IllegalArgumentException(type.getSimpleName() +" instance does not have a valid ID value.");
+            }
+            statement.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING,type.getName()+"DAO:delete "+e.getMessage());
         } finally {
             ConnectionFactory.close(statement);
             ConnectionFactory.close(connection);
