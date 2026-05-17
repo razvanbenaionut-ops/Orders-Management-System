@@ -1,11 +1,13 @@
 package businessLayer;
 
+import Model.Bill;
 import Model.Client;
 import Model.Orders;
 import Model.Product;
 import businessLayer.validators.OrderQuantityValidator;
 import businessLayer.validators.OrderStockValidator;
 import businessLayer.validators.Validator;
+import dataAccessLayer.BillDAO;
 import dataAccessLayer.ClientDAO;
 import dataAccessLayer.OrderDAO;
 import dataAccessLayer.ProductDAO;
@@ -19,10 +21,13 @@ public class OrderBLL {
     private OrderDAO orderDAO;
     private ProductDAO productDAO;
     private ClientDAO clientDAO;
+    private BillDAO billDAO;
+    int nr=1;
     public OrderBLL(){
         orderDAO=new OrderDAO();
         productDAO=new ProductDAO();
         clientDAO=new ClientDAO();
+        billDAO=new BillDAO();
         validators=new ArrayList<>();
         validators.add(new OrderQuantityValidator());
         validators.add(new OrderStockValidator(this.productDAO));
@@ -47,6 +52,9 @@ public class OrderBLL {
         order.setTotal_price(total);
         produs.setStock(produs.getStock()-order.getQuantity());
         productDAO.update(produs);
-        return orderDAO.insert(order);
+        Orders o=orderDAO.insert(order);
+        Bill bill=new Bill(1,client.getName(),produs.getName(),o.getQuantity(),produs.getPrice(),total);
+        billDAO.insertLog(bill);
+        return o;
     }
 }
