@@ -26,29 +26,40 @@ public class ProductBLL {
 
     public Product findProduct(int id)
     {
-        Product p=productDAO.findById(id);
-        if(p==null)
-        {
-            throw new NoSuchElementException("Product with id "+id+" doesnt exist");
-        }
-        return p;
+       // Product p=productDAO.findById(id);
+       // if(p==null)
+        //{
+          //  throw new NoSuchElementException("Product with id "+id+" doesnt exist");
+        //}
+        //return p;
+        List<Product> produse=productDAO.findAll();
+        return produse.stream().
+                filter(p->p.getId()==id).
+                findFirst().
+                orElseThrow(()->new NoSuchElementException("Product with id "+id+" doesnt exist"));
     }
 
     public Product addProduct(Product produs)
     {
-        for(Validator<Product> p :validators)
-        {
-            p.validate(produs);
-        }
+        //for(Validator<Product> p :validators)
+        //{
+          //  p.validate(produs);
+       // }
+        //return productDAO.insert(produs);
+        validators.stream().
+                forEach(v->v.validate(produs));
         return productDAO.insert(produs);
     }
 
     public void editProduct(Product produs)
     {
-        for(Validator<Product> p :validators)
-        {
-            p.validate(produs);
-        }
+        //for(Validator<Product> p :validators)
+        //{
+          //  p.validate(produs);
+        //}
+        //productDAO.update(produs);
+        validators.stream().
+                forEach(v->v.validate(produs));
         productDAO.update(produs);
     }
 

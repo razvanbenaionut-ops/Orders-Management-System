@@ -178,7 +178,7 @@ public class AbstractDAO<T> {
                 if(fieldName.equals("id")) {
                     idField=fields[i];
                     continue;
-                }
+                }//stream
                 sb.append(fieldName).append(" = ?");
                 if(i<fields.length-1)
                     sb.append(", ");

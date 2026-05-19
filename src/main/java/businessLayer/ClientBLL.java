@@ -24,29 +24,40 @@ public class ClientBLL {
 
     public Client findClient(int id)
     {
-        Client c=clientDAO.findById(id);
-        if(c==null)
-        {
-            throw new NoSuchElementException("Client with id "+id+" doesnt exist");
-        }
-        return c;
+        //Client c=clientDAO.findById(id);
+        //if(c==null)
+        //{
+          //  throw new NoSuchElementException("Client with id "+id+" doesnt exist");
+        //}
+        //return c;
+        List<Client> clients=clientDAO.findAll();
+        return clients.stream().
+                       filter(c->c.getId()==id).
+                       findFirst().
+                       orElseThrow(()->new NoSuchElementException("Client with id "+id+" doesnt exist"));
     }
 
     public Client addClient(Client client)
     {
-        for(Validator<Client> c :validators)
-        {
-            c.validate(client);
-        }
+        //for(Validator<Client> c:validators)
+        //{
+          //  c.validate(client);
+        //}
+        //return clientDAO.insert(client);
+        validators.stream().
+                  forEach(v->v.validate(client));
         return clientDAO.insert(client);
     }
 
     public void editClient(Client client)
     {
-        for(Validator<Client> c :validators)
-        {
-            c.validate(client);
-        }
+       // for(Validator<Client> c:validators)
+        //{
+          //  c.validate(client);
+        //}
+        //clientDAO.update(client);
+        validators.stream().
+                forEach(v->v.validate(client));
         clientDAO.update(client);
     }
 

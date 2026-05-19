@@ -39,21 +39,16 @@ public class OrderBLL {
 
     public Orders addOrder(Orders order){
         Client client=clientDAO.findById(order.getClient_id());
-        if(client==null)
-        {
-            throw new NoSuchElementException("Client with id "+order.getClient_id()+" doesnt exist");
-        }
-        for(Validator<Orders> v : validators)
-        {
-            v.validate(order);
-        }
+
+        validators.stream().
+                forEach(v->v.validate(order));
         Product produs=productDAO.findById(order.getProduct_id());
         double total=order.getQuantity()*produs.getPrice();
         order.setTotal_price(total);
         produs.setStock(produs.getStock()-order.getQuantity());
         productDAO.update(produs);
         Orders o=orderDAO.insert(order);
-        Bill bill=new Bill(1,client.getName(),produs.getName(),o.getQuantity(),produs.getPrice(),total);
+        Bill bill=new Bill(client.getName(),produs.getName(),o.getQuantity(),produs.getPrice(),total);
         billDAO.insertLog(bill);
         return o;
     }
