@@ -1,7 +1,6 @@
 package Model;
 
 public record Bill(
-        int id,
         String name_client,
         String name_product,
         int quantity,

@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class BillDAO {
 
     public void insertLog(Bill bill) {
-        String query = "INSERT INTO log (name_client, name_produs, quantity, price_product, total_price) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO log (name_client, name_product, quantity, price_product, total_price) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
